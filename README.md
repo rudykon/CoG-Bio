@@ -15,6 +15,9 @@
 </p>
 
 <p>
+  <a href="#method">🧭 Method</a> ·
+  <a href="#results">📊 Results</a> ·
+  <a href="#qualitative">🖼️ Examples</a> ·
   <a href="#installation">🚀 Installation</a> ·
   <a href="#inference">🎯 Inference</a> ·
   <a href="#training">🏋️ Training</a> ·
@@ -32,8 +35,13 @@ Implementation of CoG-Bio for structured ultrasound biometry. The final
 independently adapted predictor (IAP), fixed flip/crop views, bounded consistency
 fusion, conditional cardiac shape repair and HC/FA caliper projection.
 
-This repository contains source code, configurations and tests. Manuscripts,
-publication figures, medical images and neural checkpoints are not included.
+This repository contains source code, configurations, tests, and selected figures
+and aggregate result tables from the manuscript. The manuscript, its LaTeX
+sources, raw medical datasets and neural checkpoints are not included.
+
+<p align="center">
+  <a href="assets/readme/overview.png"><img src="assets/readme/overview.png" width="100%" alt="CoG-Bio overview: complementary MRP and IAP predictions are fused by view consistency and corrected to produce structured endpoints"></a>
+</p>
 
 <a id="highlights"></a>
 
@@ -42,6 +50,33 @@ publication figures, medical images and neural checkpoints are not included.
 | 🧠 Shared foundation | 🔀 Complementary predictors | 📐 Structured geometry |
 |---|---|---|
 | Frozen DINOv3 features with low-rank adaptation across nine tasks. | MRP and IAP combine distinct training histories with bounded, image-level consistency weights. | Training-fitted shape repair and caliper projection enforce the annotation geometry. |
+
+<a id="method"></a>
+
+## 🧭 Method
+
+<p align="center">
+  <a href="assets/readme/framework.png"><img src="assets/readme/framework.png" width="100%" alt="CoG-Bio framework: task-conditioned DINOv3 adaptations, fixed flip and crop views, bounded consistency fusion, shape repair and caliper projection"></a>
+</p>
+
+**Fixed views → consistency weighting → geometric correction.** Each predictor
+covers all nine tasks. Its flip/crop disagreement sets one bounded model weight
+shared by every landmark in the image. Reference endpoints are circles;
+predictions are crosses. Select any figure to view it at full resolution.
+
+<details>
+<summary><strong>🧠 Task-conditioned prediction head</strong></summary>
+
+<p align="center">
+  <a href="assets/readme/prediction_head.png"><img src="assets/readme/prediction_head.png" width="640" alt="Multiscale features feed spatial and coordinate branches, combined by a task-conditioned gate"></a>
+</p>
+
+Each predictor has its own spatial and coordinate branches. Decoder-feature
+scale, heatmap peak and entropy, and the task embedding condition the learned
+gate. This gate combines the branches within a predictor, before model fusion.
+Dashed arrows denote conditioning; the icons are schematic.
+
+</details>
 
 <a id="results"></a>
 
@@ -54,8 +89,94 @@ publication figures, medical images and neural checkpoints are not included.
 | Task-macro MRE in original image pixels | **23.67 px** |
 | Saved-prediction replay: maximum coordinate difference | **0 px** |
 
+### Benchmark comparison · 1,281 images
+
+All nine rows are DINOv3-based configurations of this system with different
+training histories and inference budgets. MRE is measured in original image
+pixels; the macro score weights the nine tasks equally. Lower is better.
+“Models” counts checkpoints; forwards are the maximum per image.
+
+| Configuration | Models | Max. forwards / image | Macro MRE ↓ (px) |
+|---|---:|---:|---:|
+| Initial fit | 1 | 1 | 24.56 |
+| Layout refinement | 1 | 1 | 24.59 |
+| Parameter merge | 1 | 1 | 24.43 |
+| Merge + flip | 1 | 2 | 24.23 |
+| MRP | 1 | 4 | 24.20 |
+| IAP | 1 | 4 | 25.35 |
+| Equal mean | 2 | 8 | 24.07 |
+| Consistency fusion | 2 | 8 | 23.90 |
+| **CoG-Bio** | 2 | 8 | **23.67** |
+
+<details>
+<summary><strong>📋 Full nine-task results</strong></summary>
+
+| Configuration | A4C | AOP | FA | FUGC | HC | IVC | PLAX | PSAX | Femur | Macro ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Initial fit | 29.15 | 23.22 | 27.60 | 14.59 | 20.13 | **24.53** | 23.55 | 42.91 | 15.38 | 24.56 |
+| Layout refinement | 29.22 | **21.82** | 28.55 | **14.35** | 19.38 | 25.83 | 23.35 | **42.69** | 16.15 | 24.59 |
+| Parameter merge | 29.06 | 22.35 | 27.93 | 14.42 | 19.60 | 24.88 | 23.39 | 42.74 | 15.54 | 24.43 |
+| Merge + flip | 29.06 | 22.35 | 26.96 | 14.42 | **19.09** | 24.88 | 23.39 | 42.74 | 15.20 | 24.23 |
+| MRP | 28.86 | 22.33 | 26.12 | 14.74 | 20.00 | 24.86 | 23.30 | 42.72 | 14.89 | 24.20 |
+| IAP | 26.25 | 25.96 | 25.92 | 15.02 | 19.66 | 34.63 | **21.14** | 46.23 | **13.33** | 25.35 |
+| Equal mean | 26.18 | 23.52 | 25.37 | 14.54 | 19.56 | 28.77 | 21.29 | 43.56 | 13.88 | 24.07 |
+| Consistency fusion | **26.05** | 23.63 | 25.34 | 14.53 | 19.55 | 27.40 | 21.26 | 43.87 | 13.46 | 23.90 |
+| **CoG-Bio** | **26.05** | 23.63 | **23.58** | 14.53 | 19.22 | 27.40 | 21.26 | 43.87 | 13.46 | **23.67** |
+
+Bold values mark column minima, including ties. CoG-Bio is the final selected
+configuration.
+
+</details>
+
+### Module ablation · 2,384 development images
+
+C: image-level consistency weighting; S: conditional shape repair;
+P: HC/FA projection. ✓ enables a module; — omits it. MRP and IAP are individual
+predictors; all fusion variants use the same saved predictions from both models.
+
+| Configuration | C | S | P | MRE ↓ (px) |
+|---|:---:|:---:|:---:|---:|
+| MRP | — | — | — | 27.7569 |
+| IAP | — | — | — | 26.3605 |
+| Equal mean | — | — | — | 26.3952 |
+| Consistency | ✓ | — | — | 26.1648 |
+| + shape | ✓ | ✓ | — | 25.9050 |
+| + projection | ✓ | — | ✓ | 25.9465 |
+| **CoG-Bio** | ✓ | ✓ | ✓ | **25.6867** |
+
+The development and benchmark tables report separate evaluation sets.
+
 See [reproduction notes](docs/reproduction.md) for the fixed configuration and
 [verification](VERIFICATION.md) for numerical checks and their scope.
+
+<a id="qualitative"></a>
+
+## 🖼️ Qualitative results
+
+<p align="center">
+  <a href="assets/readme/qualitative.png"><img src="assets/readme/qualitative.png" width="100%" alt="Real HC, FA and IVC development ultrasound images with reference calipers and predictions from MRP, IAP and CoG-Bio"></a>
+</p>
+
+**Real development images with existing annotations and saved predictions.**
+Green circles and dashed lines show reference calipers; red crosses and solid
+lines show predictions. Values are per-image MRE in original pixels, with the
+same crop used for every method. HC and FA are high-projection-gain examples;
+IVC illustrates a shift in fusion weight. These selected examples explain the
+mechanism rather than the frequency of improvement.
+
+<details>
+<summary><strong>🔎 Failure examples from the same study</strong></summary>
+
+<p align="center">
+  <a href="assets/readme/failures.png"><img src="assets/readme/failures.png" width="760" alt="PSAX example with stable but inaccurate predictions and an HC example where projection increases error"></a>
+</p>
+
+The largest-error PSAX development case remains inaccurate despite low view
+disagreement (87.43 px MRE). In the displayed HC case, projection increases MRE
+from 137.91 to 140.59 px. Geometric validity alone does not establish accurate
+landmark localization.
+
+</details>
 
 <a id="installation"></a>
 
@@ -202,6 +323,7 @@ Final recipes refuse a validation manifest and save the predetermined state.
 | `clingeo/inference.py`, `evaluation.py`, `io.py` | Portable inference, metrics and validation |
 | `configs/` | Selected recipes, task schema and aggregate shape prior |
 | `scripts/`, `tests/` | Command-line entry points and synthetic regression tests |
+| `assets/readme/` | Selected rendered manuscript figures used on this page |
 
 The schema retains its original task-index order, including clinical aliases,
 to load the recorded checkpoints correctly. The evaluation task list contains

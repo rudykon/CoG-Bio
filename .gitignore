@@ -24,7 +24,7 @@ htmlcov/
 .idea/
 .vscode/
 
-# Manuscripts, publication figures and source archives
+# Manuscripts and source archives
 paper/
 manuscript/
 figures/
@@ -50,3 +50,10 @@ figures/
 *.tif
 *.tiff
 *predictions*.json
+
+# Explicitly approved rendered figures for the README
+!/assets/readme/overview.png
+!/assets/readme/framework.png
+!/assets/readme/prediction_head.png
+!/assets/readme/qualitative.png
+!/assets/readme/failures.png
