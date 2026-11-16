@@ -10,6 +10,7 @@
 </p>
 
 <p>
+  <a href="https://rudykon.github.io/CoG-Bio/">🌐 项目主页</a> ·
   <a href="README.md">🌐 English</a> ·
   <a href="#method">🧭 方法</a> ·
   <a href="#results">📊 结果</a> ·
