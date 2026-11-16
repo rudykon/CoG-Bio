@@ -1,0 +1,75 @@
+{
+  "predictor": "MRP rank-8 parent",
+  "seed": 42,
+  "input_size": 512,
+  "lora_rank": 8,
+  "initialization": "fresh",
+  "data_role": "final",
+  "loss_type": "landmark",
+  "visible_augmentation": false,
+  "geometry_overrides": {},
+  "phases": [
+    {
+      "name": "warmup",
+      "precision_head": false,
+      "constant_lr": true,
+      "selected_state": "raw",
+      "equal_image_loss": false,
+      "legacy_sampling": true,
+      "training": {
+        "optimizer_steps": 313,
+        "schedule_steps": 313,
+        "warmup_steps": 0,
+        "lora_lr": 0.0003,
+        "head_lr": 0.0003,
+        "weight_decay": 0.05,
+        "ema_decay": 0.995,
+        "lr_floor": 0.1,
+        "batch_size": 2,
+        "accumulation_steps": 8
+      },
+      "loss": {
+        "heatmap": 1.0,
+        "coord_l1": 2.0,
+        "coord_heatmap": 0.0,
+        "coord_query": 0.0,
+        "wing": 1.0,
+        "geometry": 0.5,
+        "uncertainty_nll": 0.2,
+        "parameter": 0.0,
+        "heatmap_foreground_weight": 1.0
+      }
+    },
+    {
+      "name": "continuation",
+      "precision_head": true,
+      "constant_lr": false,
+      "selected_state": "ema",
+      "equal_image_loss": true,
+      "training": {
+        "optimizer_steps": 8980,
+        "batch_size": 8,
+        "accumulation_steps": 2,
+        "lora_lr": 0.0001,
+        "head_lr": 0.0002,
+        "weight_decay": 0.05,
+        "ema_decay": 0.995,
+        "warmup_steps": 157,
+        "lr_floor": 0.1,
+        "evaluate_every": 250,
+        "schedule_steps": 9370
+      },
+      "loss": {
+        "heatmap": 1.0,
+        "coord_l1": 2.0,
+        "coord_heatmap": 0.5,
+        "coord_query": 0.1,
+        "wing": 1.0,
+        "geometry": 0.5,
+        "uncertainty_nll": 0.2,
+        "parameter": 0.0,
+        "heatmap_foreground_weight": 10.0
+      }
+    }
+  ]
+}

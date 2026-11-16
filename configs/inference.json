@@ -1,0 +1,31 @@
+{
+  "input_size": 512,
+  "models": [
+    {
+      "name": "MRP",
+      "rank": 40,
+      "checkpoint": "mrp.pth",
+      "sha256": "9a0e0f659a53947a4f6c9f472c52945bb5a9effc2082bc7884b03173d0c274f4"
+    },
+    {
+      "name": "IAP",
+      "rank": 32,
+      "checkpoint": "iap.pth",
+      "sha256": "9099f8701cde35f8a109bedf6f4cff73dfd905f3b8c8c8fa4009819740d25256"
+    }
+  ],
+  "views": [
+    "flip_mean",
+    "crop_mean"
+  ],
+  "crop": {
+    "minimum_fraction": 0.8,
+    "context": 1.25
+  },
+  "fusion": "case_consistency",
+  "disagreement_floor_pixels": 2.437224555989938,
+  "shape_variant": "shape",
+  "precision": "bfloat16_features_float32_coordinates",
+  "batch_size": 8,
+  "workers": 4
+}

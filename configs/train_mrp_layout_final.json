@@ -1,0 +1,51 @@
+{
+  "predictor": "MRP rank-32 layout parent",
+  "seed": 44,
+  "input_size": 512,
+  "lora_rank": 32,
+  "initialization": "grow",
+  "data_role": "final",
+  "loss_type": "spatial",
+  "visible_augmentation": true,
+  "geometry_overrides": {
+    "A4C": {
+      "translate": 0.25
+    },
+    "IVC": {
+      "translate": 0.25
+    },
+    "PLAX": {
+      "translate": 0.25
+    },
+    "PSAX": {
+      "translate": 0.25
+    }
+  },
+  "selected_state": "raw",
+  "equal_image_loss": true,
+  "original_pixel_weighting": true,
+  "training": {
+    "optimizer_steps": 1953,
+    "batch_size": 8,
+    "accumulation_steps": 2,
+    "lora_lr": 0.0001,
+    "head_lr": 5e-05,
+    "weight_decay": 0.05,
+    "ema_decay": 0.995,
+    "warmup_steps": 79,
+    "lr_floor": 0.1,
+    "evaluate_every": 250,
+    "schedule_steps": 4685
+  },
+  "loss": {
+    "heatmap": 1.0,
+    "coord_l1": 2.0,
+    "coord_heatmap": 0.5,
+    "coord_query": 0.1,
+    "wing": 1.0,
+    "geometry": 0.5,
+    "uncertainty_nll": 0.2,
+    "parameter": 0.0,
+    "heatmap_foreground_weight": 1.0
+  }
+}

@@ -1,0 +1,245 @@
+schema_version: 1
+method_name: ClinGeo-USBiometry
+notes:
+  - "FA is the dataset domain for fetal abdomen. AC is kept as the clinical alias required by the project plan."
+  - "fetal_femur is the dataset domain for Femur. Femur is kept as the clinical alias required by the project plan."
+  - "Clinical derivations marked TODO_OFFICIAL_FORMULA are not treated as official challenge formulas."
+
+domains:
+  HC:
+    num_landmarks: 4
+    allow_hflip: true
+    flip_pairs:
+      - [2, 3]
+    geometry_type: ellipse
+    clinical_params:
+      HC:
+        derivation: four_point_ellipse_perimeter_fallback
+        unit: px
+        todo: "Replace with official HC formula and spacing normalization if released."
+      BPD:
+        derivation: paired_distance_fallback
+        unit: px
+        todo: "Official BPD point pair is not reliably inferable from current files."
+    heatmap_sigma: 5.0
+    refiner_roi_scale: 0.15
+    use_pca_shape_prior: true
+    postprocess:
+      ellipse_projection: true
+
+  AC:
+    aliases: [FA]
+    num_landmarks: 4
+    allow_hflip: true
+    flip_pairs:
+      - [2, 3]
+    geometry_type: ellipse
+    clinical_params:
+      AC:
+        derivation: four_point_ellipse_perimeter_fallback
+        unit: px
+        todo: "Dataset labels expose FA; official AC/FA naming and formula must be confirmed."
+      FA:
+        derivation: four_point_ellipse_perimeter_fallback
+        unit: px
+        todo: "Fallback only; use the official FA_train_new.csv definition when available."
+    heatmap_sigma: 5.0
+    refiner_roi_scale: 0.15
+    use_pca_shape_prior: true
+    postprocess:
+      ellipse_projection: true
+
+  FA:
+    canonical: AC
+    num_landmarks: 4
+    allow_hflip: true
+    flip_pairs:
+      - [2, 3]
+    geometry_type: ellipse
+    clinical_params:
+      FA:
+        derivation: four_point_ellipse_perimeter_fallback
+        unit: px
+        todo: "Fallback only; verify against FA_train_new.csv and official scorer."
+    heatmap_sigma: 5.0
+    refiner_roi_scale: 0.15
+    use_pca_shape_prior: true
+    postprocess:
+      ellipse_projection: true
+
+  Femur:
+    aliases: [fetal_femur]
+    num_landmarks: 2
+    allow_hflip: true
+    flip_pairs:
+      - [0, 1]
+    geometry_type: long_bone
+    clinical_params:
+      FL:
+        derivation: euclidean_distance
+        unit: px
+        todo: "Spacing conversion is unavailable in current annotations."
+    heatmap_sigma: 2.5
+    refiner_roi_scale: 0.08
+    use_pca_shape_prior: false
+    postprocess:
+      endpoint_snap: true
+
+  fetal_femur:
+    canonical: Femur
+    num_landmarks: 2
+    allow_hflip: true
+    flip_pairs:
+      - [0, 1]
+    geometry_type: long_bone
+    clinical_params:
+      FL:
+        derivation: euclidean_distance
+        unit: px
+        todo: "Dataset domain alias for Femur."
+    heatmap_sigma: 2.5
+    refiner_roi_scale: 0.08
+    use_pca_shape_prior: false
+    postprocess:
+      endpoint_snap: true
+
+  AOP:
+    num_landmarks: 4
+    allow_hflip: false
+    flip_pairs: []
+    geometry_type: angle
+    clinical_params:
+      AOP:
+        derivation: calibrated_angle_between_lines_fallback
+        unit: degree
+        todo: "Calibrated on released AOP training CSV; official point ordering/formula must be confirmed from challenge notice."
+      HSD:
+        derivation: calibrated_point1_to_line_point3_point4_distance_fallback
+        unit: px
+        todo: "Calibrated on released AOP training CSV; official HSD geometry must be confirmed."
+    heatmap_sigma: 3.0
+    refiner_roi_scale: 0.12
+    official_order_fixed: true
+    use_pca_shape_prior: false
+    postprocess:
+      angle_consistency: true
+
+  FUGC:
+    num_landmarks: 2
+    allow_hflip: false
+    flip_pairs: []
+    geometry_type: long_bone
+    clinical_params:
+      FUGC:
+        derivation: euclidean_distance
+        unit: px
+        todo: "Fallback for FUGC_MAE because official FUGC clinical formula/name is not included in current metadata."
+    heatmap_sigma: 2.5
+    refiner_roi_scale: 0.08
+    use_pca_shape_prior: false
+    postprocess:
+      endpoint_snap: true
+
+  A4C:
+    num_landmarks: 16
+    allow_hflip: false
+    flip_pairs: []
+    geometry_type: cardiac_topology
+    clinical_params:
+      LV_diameter:
+        derivation: paired_distance_fallback
+        unit: px
+        todo: "Current annotation contains LV vertical/horizontal pairs; official aggregation must be confirmed."
+      RV_diameter:
+        derivation: paired_distance_fallback
+        unit: px
+        todo: "Fallback only."
+      LA_diameter:
+        derivation: paired_distance_fallback
+        unit: px
+        todo: "Fallback only."
+      RA_diameter:
+        derivation: paired_distance_fallback
+        unit: px
+        todo: "Fallback only."
+    heatmap_sigma: 3.0
+    refiner_roi_scale: 0.15
+    use_pca_shape_prior: true
+    postprocess:
+      topology_check: true
+      point_ordering: none
+      universal_y_order: false
+      pair_semantics:
+        - indices: [1, 2]
+          axis: vertical
+          orientation_rule: first_above_second
+        - indices: [3, 4]
+          axis: horizontal
+          orientation_rule: horizontal_pair_y_equal
+        - indices: [5, 6]
+          axis: vertical
+          orientation_rule: first_above_second
+        - indices: [7, 8]
+          axis: horizontal
+          orientation_rule: horizontal_pair_y_equal
+        - indices: [9, 10]
+          axis: vertical
+          orientation_rule: first_above_second
+        - indices: [11, 12]
+          axis: horizontal
+          orientation_rule: horizontal_pair_y_equal
+        - indices: [13, 14]
+          axis: vertical
+          orientation_rule: first_above_second
+        - indices: [15, 16]
+          axis: horizontal
+          orientation_rule: horizontal_pair_y_equal
+
+  PLAX:
+    num_landmarks: 22
+    allow_hflip: false
+    flip_pairs: []
+    geometry_type: cardiac_topology
+    clinical_params:
+      paired_diameters:
+        derivation: paired_distance_fallback
+        unit: px
+        todo: "Official PLAX parameter mapping is not included in current metadata."
+    heatmap_sigma: 3.0
+    refiner_roi_scale: 0.15
+    use_pca_shape_prior: true
+    postprocess:
+      topology_check: true
+
+  PSAX:
+    num_landmarks: 4
+    allow_hflip: false
+    flip_pairs: []
+    geometry_type: cardiac_topology
+    clinical_params:
+      RVOT:
+        derivation: euclidean_distance
+        unit: px
+      PA:
+        derivation: euclidean_distance
+        unit: px
+    heatmap_sigma: 3.0
+    refiner_roi_scale: 0.12
+    use_pca_shape_prior: false
+    postprocess:
+      topology_check: true
+
+  IVC:
+    num_landmarks: 2
+    allow_hflip: false
+    flip_pairs: []
+    geometry_type: long_bone
+    clinical_params:
+      IVC:
+        derivation: euclidean_distance
+        unit: px
+    heatmap_sigma: 2.5
+    refiner_roi_scale: 0.08
+    use_pca_shape_prior: false
+    postprocess:
+      endpoint_snap: true

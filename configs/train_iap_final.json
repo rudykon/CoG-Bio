@@ -1,0 +1,47 @@
+{
+  "predictor": "IAP",
+  "seed": 46,
+  "input_size": 512,
+  "lora_rank": 32,
+  "initialization": "fresh",
+  "loss_type": "mre",
+  "loss": {
+    "mre": 1.0,
+    "spatial_mre": 0.5,
+    "query_mre": 0.1,
+    "spatial_ce": 1.0
+  },
+  "geometry_overrides": {
+    "A4C": {
+      "translate": 0.25
+    },
+    "IVC": {
+      "translate": 0.25
+    },
+    "PLAX": {
+      "translate": 0.25
+    },
+    "PSAX": {
+      "translate": 0.25
+    }
+  },
+  "visible_augmentation": true,
+  "equal_image_loss": false,
+  "original_pixel_weighting": false,
+  "selected_state": "ema",
+  "training": {
+    "optimizer_steps": 8199,
+    "warmup_steps": 235,
+    "batch_size": 8,
+    "accumulation_steps": 2,
+    "lora_lr": 0.0001,
+    "head_lr": 0.0002,
+    "weight_decay": 0.05,
+    "ema_decay": 0.995,
+    "lr_floor": 0.1,
+    "evaluate_every": 750,
+    "schedule_steps": 9370
+  },
+  "selection_view": "native",
+  "data_role": "final"
+}
