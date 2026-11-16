@@ -57,3 +57,6 @@ figures/
 !/assets/readme/prediction_head.png
 !/assets/readme/qualitative.png
 !/assets/readme/failures.png
+
+# Approved static poster for the project homepage
+!/assets/poster/cogbio-poster.png

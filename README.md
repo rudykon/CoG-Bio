@@ -15,7 +15,7 @@
 </p>
 
 <p>
-  <a href="https://rudykon.github.io/CoG-Bio/">🌐 Project page</a> ·
+  <a href="https://rudykon.github.io/CoG-Bio/">🖼️ Poster</a> ·
   <a href="#method">🧭 Method</a> ·
   <a href="#results">📊 Results</a> ·
   <a href="#qualitative">🖼️ Examples</a> ·
